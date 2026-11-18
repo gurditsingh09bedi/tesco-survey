@@ -83,6 +83,36 @@
     Paste your Apps Script URL into <code>API_URL</code> in index.html to share entries across everyone.
   </div>
 
+  <!-- COMMON DASHBOARD (always visible) -->
+    <div class="card" id="overallCard">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:6px;flex-wrap:wrap">
+        <h2 style="margin:0">Overall – all surveyors</h2>
+        <div style="display:flex;gap:6px">
+          <button class="btn ghost small refresh">↻ Refresh</button>
+          <button class="btn ghost small" id="dlCsv">Download CSV</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="sStores">–</b><span>Stores</span></div>
+        <div class="stat"><b id="sPeople">–</b><span>People asked</span></div>
+        <div class="stat"><b id="sYes">–</b><span>Know</span></div>
+        <div class="stat"><b id="sPct">–</b><span>Awareness</span></div>
+      </div>
+      <div class="stats" style="margin-top:8px;grid-template-columns:repeat(3,1fr)">
+        <div class="stat"><b id="sSurveyors">–</b><span>Surveyors</span></div>
+        <div class="stat"><b id="sNo" style="color:var(--no)">–</b><span>Don't know</span></div>
+        <div class="stat"><b id="sMay" style="color:var(--may)">–</b><span>Not sure</span></div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="meta muted" style="font-size:13px">Awareness across all stores</div>
+        <div class="bar" style="height:12px;border-radius:6px;display:flex">
+          <i id="barYes" style="background:var(--yes);width:0"></i><i id="barMay" style="background:var(--may);width:0"></i><i id="barNo" style="background:var(--no);width:0"></i>
+        </div>
+        <div class="chips" style="margin-top:8px"><span class="chip yes">Know</span><span class="chip may">Not sure</span><span class="chip no">Don't know</span></div>
+      </div>
+      <p class="muted" id="lastUpd" style="font-size:12px;margin:12px 0 0"></p>
+    </div>
+
   <!-- Step 1: who is surveying -->
   <form class="card" id="loginCard" hidden autocomplete="off">
     <h2>Who's doing the survey?</h2>
@@ -105,7 +135,6 @@
     <div class="tabs" role="tablist">
       <button data-tab="add" class="on">+ Add entry</button>
       <button data-tab="mine">My entries</button>
-      <button data-tab="dash">Dashboard</button>
     </div>
 
     <!-- ADD -->
@@ -152,37 +181,6 @@
       </div>
     </section>
 
-    <!-- DASHBOARD -->
-    <section data-pane="dash" hidden>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:6px;flex-wrap:wrap">
-          <h2 style="margin:0">Overall – all surveyors</h2>
-          <div style="display:flex;gap:6px">
-            <button class="btn ghost small refresh">↻ Refresh</button>
-            <button class="btn ghost small" id="dlCsv">Download CSV</button>
-          </div>
-        </div>
-        <div class="stats">
-          <div class="stat"><b id="sStores">–</b><span>Stores</span></div>
-          <div class="stat"><b id="sPeople">–</b><span>People asked</span></div>
-          <div class="stat"><b id="sYes">–</b><span>Know</span></div>
-          <div class="stat"><b id="sPct">–</b><span>Awareness</span></div>
-        </div>
-        <div class="stats" style="margin-top:8px;grid-template-columns:repeat(3,1fr)">
-          <div class="stat"><b id="sSurveyors">–</b><span>Surveyors</span></div>
-          <div class="stat"><b id="sNo" style="color:var(--no)">–</b><span>Don't know</span></div>
-          <div class="stat"><b id="sMay" style="color:var(--may)">–</b><span>Not sure</span></div>
-        </div>
-        <div style="margin-top:14px">
-          <div class="meta muted" style="font-size:13px">Awareness across all stores</div>
-          <div class="bar" style="height:12px;border-radius:6px;display:flex">
-            <i id="barYes" style="background:var(--yes);width:0"></i><i id="barMay" style="background:var(--may);width:0"></i><i id="barNo" style="background:var(--no);width:0"></i>
-          </div>
-          <div class="chips" style="margin-top:8px"><span class="chip yes">Know</span><span class="chip may">Not sure</span><span class="chip no">Don't know</span></div>
-        </div>
-        <p class="muted" id="lastUpd" style="font-size:12px;margin:12px 0 0"></p>
-      </div>
-    </section>
   </div>
 </main>
 
