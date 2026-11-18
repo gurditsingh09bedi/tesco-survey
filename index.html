@@ -1,0 +1,446 @@
+<!-- test -->
+  indented
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tesco Mobile Awareness – Store Survey</title>
+<style>
+  :root{--bg:#f4f6fa;--card:#fff;--ink:#1b2333;--mut:#667085;--line:#e3e7ee;--pri:#0b4ea2;--yes:#1a7f4b;--no:#c0392b;--may:#b7791f}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:16px}
+  header{background:var(--pri);color:#fff;padding:18px 16px}
+  header h1{margin:0;font-size:20px}
+  header p{margin:4px 0 0;opacity:.85;font-size:14px}
+  main{max-width:720px;margin:0 auto;padding:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  h2{font-size:17px;margin:0 0 12px}
+  label{display:block;font-size:14px;font-weight:600;margin:10px 0 4px}
+  input,textarea,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font-size:16px;font-family:inherit;background:#fff}
+  textarea{min-height:70px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .person{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;margin-bottom:8px}
+  .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{border:0;background:#fff;padding:10px 9px;font-size:13px;cursor:pointer;color:var(--mut)}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button.on.yes{background:var(--yes);color:#fff}
+  .seg button.on.no{background:var(--no);color:#fff}
+  .seg button.on.may{background:var(--may);color:#fff}
+  .x{border:0;background:none;font-size:20px;color:var(--mut);cursor:pointer;padding:4px 6px}
+  .btn{border:0;border-radius:8px;padding:12px 16px;font-size:15px;font-weight:600;cursor:pointer}
+  .btn.pri{background:var(--pri);color:#fff}
+  .btn.ghost{background:#eef2f8;color:var(--pri)}
+  .btn.small{padding:7px 11px;font-size:13px}
+  .btn:disabled{opacity:.6;cursor:default}
+  .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .msg{font-size:14px;margin-top:10px;min-height:18px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .stat{background:#f7f9fc;border-radius:10px;padding:10px;text-align:center}
+  .stat b{display:block;font-size:22px}
+  .stat span{font-size:12px;color:var(--mut)}
+  .entry{border-top:1px solid var(--line);padding:12px 0}
+  .entry:first-child{border-top:0}
+  .entry .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .entry h3{margin:0;font-size:16px}
+  .entry .meta{font-size:13px;color:var(--mut);margin-top:2px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .chip{font-size:12px;padding:3px 8px;border-radius:20px;color:#fff}
+  .chip.yes{background:var(--yes)}.chip.no{background:var(--no)}.chip.may{background:var(--may)}
+  .note{font-size:13px;color:var(--mut);margin-top:6px;white-space:pre-wrap}
+  .muted{color:var(--mut);font-size:14px}
+  .bar{height:8px;background:#eee;border-radius:4px;overflow:hidden;margin-top:6px}
+  .bar i{display:block;height:100%;background:var(--yes)}
+  .warn{background:#fff7e6;border:1px solid #f5d38a;color:#7a5200;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px}
+  input[type=search]{margin-bottom:8px}
+  @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}.row2{grid-template-columns:1fr}}
+  .tabs{display:flex;gap:6px;margin-bottom:14px;background:#e8edf5;padding:4px;border-radius:10px}
+  .tabs button{flex:1;border:0;background:none;padding:10px 6px;border-radius:8px;font-size:14px;font-weight:600;color:var(--mut);cursor:pointer}
+  .tabs button.on{background:#fff;color:var(--pri);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .who{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+  .who b{font-size:15px}
+  .avatar{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--pri);color:#fff;font-weight:700;font-size:14px;margin-right:8px;flex-shrink:0}
+  .sv{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden}
+  .sv summary{list-style:none;cursor:pointer;padding:12px;display:flex;align-items:center;gap:8px}
+  .sv summary::-webkit-details-marker{display:none}
+  .sv summary .nm{flex:1;min-width:0}
+  .sv summary .nm b{display:block;font-size:15px}
+  .sv summary .nm span{font-size:12px;color:var(--mut)}
+  .sv summary .pc{font-size:18px;font-weight:700;text-align:right}
+  .sv summary .pc small{display:block;font-size:11px;color:var(--mut);font-weight:400}
+  .sv .body{padding:0 12px 4px;border-top:1px solid var(--line)}
+  .sv[open] summary{background:#f7f9fc}
+  .rank{font-size:12px;color:var(--mut);width:18px;text-align:center}
+  .me-tag{font-size:11px;background:#e6efff;color:var(--pri);padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <h1>Tesco Mobile Awareness – Store Survey</h1>
+  <p>Add a store, list the people you asked, and mark whether they know about Tesco Mobile.</p>
+</header>
+<main>
+  <div class="warn" id="localWarn" hidden>
+    Demo mode: no Google Sheet is connected yet, so entries are saved only on this device.
+    Paste your Apps Script URL into <code>API_URL</code> in index.html to share entries across everyone.
+  </div>
+
+  <!-- Step 1: who is surveying -->
+  <form class="card" id="loginCard" hidden autocomplete="off">
+    <h2>Who's doing the survey?</h2>
+    <p class="muted" style="margin:0 0 6px">Enter your name once. Every entry you add will be saved under your name.</p>
+    <label for="loginName">Your name *</label>
+    <input id="loginName" required maxlength="80" list="surveyorList" placeholder="e.g. Gurdit Singh">
+    <datalist id="surveyorList"></datalist>
+    <div class="actions"><button type="submit" class="btn pri">Start</button></div>
+  </form>
+
+  <div id="app" hidden>
+    <div class="who">
+      <div style="display:flex;align-items:center;min-width:0">
+        <span class="avatar" id="meAvatar">?</span>
+        <div style="min-width:0"><span class="muted" style="font-size:12px">Surveying as</span><br><b id="meName"></b></div>
+      </div>
+      <button class="btn ghost small" id="switchUser">Change</button>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button data-tab="add" class="on">+ Add entry</button>
+      <button data-tab="mine">My entries</button>
+      <button data-tab="dash">Dashboard</button>
+    </div>
+
+    <!-- ADD -->
+    <section data-pane="add">
+      <form class="card" id="form" autocomplete="off">
+        <h2 id="formTitle">New entry</h2>
+        <div class="row2">
+          <div><label for="manager">Store manager name *</label><input id="manager" required maxlength="80"></div>
+          <div><label for="location">Store location *</label><input id="location" required maxlength="120" placeholder="e.g. Yeading"></div>
+        </div>
+        <label for="date">Date</label><input id="date" type="date">
+
+        <label>People asked</label>
+        <div id="people"></div>
+        <button type="button" class="btn ghost small" id="addPerson">+ Add person</button>
+
+        <label for="comments">Comments</label>
+        <textarea id="comments" maxlength="1000"></textarea>
+
+        <div class="actions">
+          <button type="submit" class="btn pri" id="saveBtn">Save entry</button>
+          <button type="button" class="btn ghost" id="cancelBtn" hidden>Cancel edit</button>
+        </div>
+        <div class="msg" id="msg"></div>
+      </form>
+    </section>
+
+    <!-- MINE -->
+    <section data-pane="mine" hidden>
+      <div class="card">
+        <div class="stats">
+          <div class="stat"><b id="mStores">–</b><span>My stores</span></div>
+          <div class="stat"><b id="mPeople">–</b><span>People I asked</span></div>
+          <div class="stat"><b id="mYes">–</b><span>Know</span></div>
+          <div class="stat"><b id="mPct">–</b><span>Awareness</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h2 style="margin:0">My entries</h2>
+          <button class="btn ghost small refresh">↻ Refresh</button>
+        </div>
+        <div id="mineList"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section data-pane="dash" hidden>
+      <div class="card">
+        <h2>Overall</h2>
+        <div class="stats">
+          <div class="stat"><b id="sStores">–</b><span>Stores</span></div>
+          <div class="stat"><b id="sPeople">–</b><span>People asked</span></div>
+          <div class="stat"><b id="sYes">–</b><span>Know</span></div>
+          <div class="stat"><b id="sPct">–</b><span>Awareness</span></div>
+        </div>
+        <div class="stats" style="margin-top:8px;grid-template-columns:repeat(3,1fr)">
+          <div class="stat"><b id="sSurveyors">–</b><span>Surveyors</span></div>
+          <div class="stat"><b id="sNo" style="color:var(--no)">–</b><span>Don't know</span></div>
+          <div class="stat"><b id="sMay" style="color:var(--may)">–</b><span>Not sure</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:6px;flex-wrap:wrap">
+          <h2 style="margin:0">By surveyor</h2>
+          <div style="display:flex;gap:6px">
+            <button class="btn ghost small refresh">↻ Refresh</button>
+            <button class="btn ghost small" id="dlCsv">Download CSV</button>
+          </div>
+        </div>
+        <input type="search" id="search" placeholder="Search surveyor, store or manager…">
+        <div id="dashList"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+/* ===================== CONFIG =====================
+   Paste your Google Apps Script Web App URL here (ends with /exec).
+   Leave empty to run in demo mode (saves on this device only). */
+const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ7Dh_vVKt48Qmn30Kx7nxH4WJ86N_AGqWNt3eLNQAeQW2/exec";
+/* ================================================== */
+
+(function(){
+  const $ = id => document.getElementById(id);
+  const STATUS = {yes:"Knows", no:"Doesn't know", may:"Not sure"};
+  const LOCAL_KEY = "tm_survey_entries";
+  let entries = [], editingId = null, me = "";
+  const norm = s => String(s||"").trim().replace(/\s+/g," ").toLowerCase();
+  const nice = s => String(s||"").trim().replace(/\s+/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+
+  // ---------- storage backend ----------
+  const store = API_URL ? {
+    async list(){
+      const r = await fetch(API_URL, {cache:"no-store"});
+      const j = await r.json(); if(!j.ok) throw new Error(j.error||"load failed");
+      return j.entries || [];
+    },
+    async post(payload){
+      // text/plain avoids a CORS preflight, which Apps Script does not support
+      const r = await fetch(API_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(payload)});
+      const j = await r.json(); if(!j.ok) throw new Error(j.error||"save failed");
+      return j;
+    },
+    save(entry){ return this.post({action:"save", entry}); },
+    remove(id){ return this.post({action:"delete", id}); }
+  } : {
+    read(){ try{ return JSON.parse(localStorage.getItem(LOCAL_KEY)||"[]"); }catch(e){ return []; } },
+    write(a){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(a)); }catch(e){} },
+    async list(){ return this.read().sort((a,b)=>(b.updatedAt>a.updatedAt?1:-1)); },
+    async save(entry){
+      const a = this.read(); entry.id = entry.id || Math.random().toString(36).slice(2,12)+Date.now().toString(36);
+      const i = a.findIndex(x=>x.id===entry.id); if(i>=0) a[i]=entry; else a.push(entry);
+      this.write(a); return {ok:true,id:entry.id};
+    },
+    async remove(id){ this.write(this.read().filter(x=>x.id!==id)); return {ok:true}; }
+  };
+  if (!API_URL) $("localWarn").hidden = false;
+
+  async function load(showLoading){
+    if (showLoading){ $("mineList").innerHTML = $("dashList").innerHTML = '<p class="muted">Loading entries…</p>'; }
+    try{ entries = await store.list(); render(); }
+    catch(e){ $("mineList").innerHTML = $("dashList").innerHTML = '<p class="muted">Couldn\'t load entries. Check your connection and tap Refresh.</p>'; }
+  }
+  document.querySelectorAll(".refresh").forEach(b=>b.onclick=()=>load(true));
+
+  // ---------- who am I ----------
+  function setMe(name){
+    me = nice(name);
+    try{ localStorage.setItem("tm_by", me); }catch(e){}
+    $("meName").textContent = me;
+    $("meAvatar").textContent = me.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase() || "?";
+    $("loginCard").hidden = true; $("app").hidden = false;
+    render();
+  }
+  $("loginCard").addEventListener("submit", e=>{ e.preventDefault(); const v=$("loginName").value.trim(); if(v) setMe(v); });
+  $("switchUser").onclick = ()=>{
+    $("app").hidden = true; $("loginCard").hidden = false;
+    $("loginName").value = ""; $("loginName").focus(); resetForm();
+  };
+
+  // ---------- tabs ----------
+  function showTab(t){
+    document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
+    document.querySelectorAll("[data-pane]").forEach(p=>p.hidden = p.dataset.pane!==t);
+    if (t!=="add") load();
+  }
+  document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+  // ---------- people rows ----------
+  function addPersonRow(p){
+    p = p || {name:"", status:""};
+    const row = document.createElement("div");
+    row.className = "person";
+    row.dataset.status = p.status || "";
+    const inp = document.createElement("input");
+    inp.placeholder = "Employee name (optional)"; inp.maxLength = 60; inp.value = p.name || "";
+    const seg = document.createElement("div"); seg.className = "seg";
+    [["yes","Yes"],["no","No"],["may","Not sure"]].forEach(([k,t])=>{
+      const b = document.createElement("button"); b.type="button"; b.textContent=t; b.className=k;
+      if (row.dataset.status===k) b.classList.add("on");
+      b.onclick = ()=>{ row.dataset.status=k; seg.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); };
+      seg.appendChild(b);
+    });
+    const x = document.createElement("button"); x.type="button"; x.className="x"; x.textContent="×"; x.title="Remove";
+    x.onclick = ()=>{ row.remove(); if(!$("people").children.length) addPersonRow(); };
+    row.append(inp, seg, x);
+    $("people").appendChild(row);
+  }
+  function readPeople(){
+    return [...$("people").children].map(r=>({
+      name: r.querySelector("input").value.trim(),
+      status: r.dataset.status
+    })).filter(p=>p.status || p.name);
+  }
+  $("addPerson").onclick = ()=>addPersonRow();
+
+  function resetForm(){
+    editingId = null;
+    $("form").reset();
+    $("date").value = new Date().toISOString().slice(0,10);
+    $("people").innerHTML = ""; for(let i=0;i<3;i++) addPersonRow();
+    $("formTitle").textContent = "New entry";
+    $("saveBtn").textContent = "Save entry";
+    $("cancelBtn").hidden = true;
+  }
+  $("cancelBtn").onclick = ()=>{ resetForm(); setMsg(""); };
+
+  function setMsg(t, ok){ $("msg").textContent=t; $("msg").style.color = ok ? "var(--yes)" : "var(--no)"; }
+
+  // ---------- save ----------
+  $("form").addEventListener("submit", async e=>{
+    e.preventDefault();
+    if (!me){ $("switchUser").click(); return; }
+    const people = readPeople();
+    if (people.some(p=>!p.status)){ setMsg("Pick Yes / No / Not sure for every person (or remove the empty row)."); return; }
+    if (!people.length){ setMsg("Add at least one person."); return; }
+    const now = new Date().toISOString();
+    const old = editingId && entries.find(x=>x.id===editingId);
+    const body = {
+      id: editingId || "",
+      manager: $("manager").value.trim(),
+      location: $("location").value.trim(),
+      date: $("date").value || "",
+      by: old ? old.by : me,
+      people,
+      comments: $("comments").value.trim(),
+      createdAt: old && old.createdAt ? old.createdAt : now,
+      updatedAt: now
+    };
+    const wasEdit = !!editingId;
+    $("saveBtn").disabled = true; setMsg("Saving…", true);
+    try{
+      await store.save(body);
+      setMsg((wasEdit ? "Entry updated ✓" : "Saved under "+me+" ✓"), true);
+      resetForm(); await load();
+    }catch(err){ setMsg("Couldn't save – please check your connection and try again."); }
+    finally{ $("saveBtn").disabled = false; }
+  });
+
+  // ---------- render ----------
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function tally(list){
+    let p=0,y=0,n=0,m=0;
+    list.forEach(e=>(e.people||[]).forEach(x=>{ p++; if(x.status==="yes")y++; else if(x.status==="no")n++; else m++; }));
+    return {stores:list.length, people:p, yes:y, no:n, may:m, pct:p?Math.round(y*100/p):null};
+  }
+  function entryHtml(e, editable){
+    const ppl = e.people||[], y = ppl.filter(p=>p.status==="yes").length;
+    const pct = ppl.length ? Math.round(y*100/ppl.length) : 0;
+    return `<div class="entry">
+      <div class="top">
+        <div>
+          <h3>${esc(e.location)}</h3>
+          <div class="meta">Manager: ${esc(e.manager)}${e.date?" · "+esc(e.date):""}</div>
+        </div>
+        ${editable?`<div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn ghost small" data-edit="${esc(e.id)}">Edit</button>
+          <button class="btn ghost small" data-del="${esc(e.id)}" style="color:var(--no)">Delete</button>
+        </div>`:""}
+      </div>
+      <div class="meta" style="margin-top:6px"><b>${y} of ${ppl.length}</b> know Tesco Mobile (${pct}%)</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="chips">${ppl.map((p,i)=>`<span class="chip ${esc(p.status)}">${esc(p.name||"Person "+(i+1))}: ${esc(STATUS[p.status]||"")}</span>`).join("")}</div>
+      ${e.comments?`<div class="note">${esc(e.comments)}</div>`:""}
+    </div>`;
+  }
+  function render(){
+    // surveyor suggestions for login
+    const names = [...new Map(entries.filter(e=>e.by).map(e=>[norm(e.by), nice(e.by)])).values()].sort();
+    $("surveyorList").innerHTML = names.map(n=>`<option value="${esc(n)}">`).join("");
+
+    // overall
+    const t = tally(entries);
+    $("sStores").textContent=t.stores; $("sPeople").textContent=t.people; $("sYes").textContent=t.yes;
+    $("sPct").textContent = t.pct==null?"–":t.pct+"%"; $("sNo").textContent=t.no; $("sMay").textContent=t.may;
+    $("sSurveyors").textContent = names.length;
+
+    // mine
+    const mine = entries.filter(e=>norm(e.by)===norm(me));
+    const mt = tally(mine);
+    $("mStores").textContent=mt.stores; $("mPeople").textContent=mt.people; $("mYes").textContent=mt.yes;
+    $("mPct").textContent = mt.pct==null?"–":mt.pct+"%";
+    $("mineList").innerHTML = mine.length ? mine.map(e=>entryHtml(e,true)).join("")
+      : '<p class="muted">You haven\'t added any entries yet. Use "+ Add entry" to add your first store.</p>';
+
+    // dashboard grouped by surveyor
+    const q = norm($("search").value);
+    const groups = new Map();
+    entries.forEach(e=>{
+      const k = norm(e.by) || "(no name)";
+      if(!groups.has(k)) groups.set(k,{name:nice(e.by)||"(no name)", list:[]});
+      groups.get(k).list.push(e);
+    });
+    let gs = [...groups.entries()].map(([k,g])=>{
+      const list = q ? g.list.filter(e=>norm(g.name+" "+e.location+" "+e.manager).includes(q)) : g.list;
+      return {k, name:g.name, list, t:tally(g.list)};
+    }).filter(g=>g.list.length);
+    gs.sort((a,b)=>b.t.people-a.t.people || a.name.localeCompare(b.name));
+    if (!entries.length){ $("dashList").innerHTML='<p class="muted">No entries yet.</p>'; return; }
+    if (!gs.length){ $("dashList").innerHTML='<p class="muted">No matches.</p>'; return; }
+    $("dashList").innerHTML = gs.map((g,i)=>`<details class="sv"${q||gs.length===1?" open":""}>
+      <summary>
+        <span class="rank">${i+1}</span>
+        <span class="avatar">${esc(g.name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase())}</span>
+        <span class="nm"><b>${esc(g.name)}${g.k===norm(me)?'<span class="me-tag">You</span>':""}</b>
+          <span>${g.t.stores} store${g.t.stores===1?"":"s"} · ${g.t.people} people · ${g.t.yes} know · ${g.t.no} don't · ${g.t.may} not sure</span></span>
+        <span class="pc">${g.t.pct==null?"–":g.t.pct+"%"}<small>aware</small></span>
+      </summary>
+      <div class="body">${g.list.map(e=>entryHtml(e, g.k===norm(me))).join("")}</div>
+    </details>`).join("");
+  }
+  $("search").addEventListener("input", render);
+
+  document.addEventListener("click", async ev=>{
+    const ed = ev.target.closest("[data-edit]"), dl = ev.target.closest("[data-del]");
+    if (ed){
+      const e = entries.find(x=>x.id===ed.dataset.edit); if(!e) return;
+      editingId = e.id;
+      $("manager").value=e.manager||""; $("location").value=e.location||""; $("date").value=e.date||"";
+      $("comments").value=e.comments||"";
+      $("people").innerHTML=""; (e.people&&e.people.length?e.people:[{}]).forEach(p=>addPersonRow(p));
+      $("formTitle").textContent="Editing: "+(e.location||"entry");
+      $("saveBtn").textContent="Update entry"; $("cancelBtn").hidden=false; setMsg("");
+      showTab("add"); $("form").scrollIntoView({behavior:"smooth"});
+    }
+    if (dl){
+      if (dl.dataset.confirm!=="1"){ dl.dataset.confirm="1"; dl.textContent="Tap again"; setTimeout(()=>{dl.dataset.confirm="";dl.textContent="Delete";},3000); return; }
+      dl.disabled = true; dl.textContent = "Deleting…";
+      try{ await store.remove(dl.dataset.del); if(editingId===dl.dataset.del) resetForm(); await load(); }
+      catch(err){ dl.disabled=false; dl.textContent="Delete"; }
+    }
+  });
+
+  // ---------- CSV download ----------
+  $("dlCsv").onclick = ()=>{
+    const rows=[["Surveyor","Store location","Manager","Date","Employee asked","Knows Tesco Mobile","Comments"]];
+    entries.forEach(e=>(e.people||[]).forEach((p,i)=>rows.push([nice(e.by),e.location,e.manager,e.date,p.name||"Person "+(i+1),STATUS[p.status]||"",e.comments])));
+    const csv = rows.map(r=>r.map(v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"').join(",")).join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));
+    a.download = "tesco-mobile-survey-"+new Date().toISOString().slice(0,10)+".csv";
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  // ---------- start ----------
+  resetForm();
+  let saved = ""; try{ saved = localStorage.getItem("tm_by") || ""; }catch(e){}
+  if (saved) setMe(saved); else $("loginCard").hidden = false;
+  load(true);
+  setInterval(()=>{ if(!document.hidden && !editingId) load(); }, 30000);
+})();
+</script>
+</body>
+</html>
