@@ -155,7 +155,13 @@
     <!-- DASHBOARD -->
     <section data-pane="dash" hidden>
       <div class="card">
-        <h2>Overall</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:6px;flex-wrap:wrap">
+          <h2 style="margin:0">Overall – all surveyors</h2>
+          <div style="display:flex;gap:6px">
+            <button class="btn ghost small refresh">↻ Refresh</button>
+            <button class="btn ghost small" id="dlCsv">Download CSV</button>
+          </div>
+        </div>
         <div class="stats">
           <div class="stat"><b id="sStores">–</b><span>Stores</span></div>
           <div class="stat"><b id="sPeople">–</b><span>People asked</span></div>
@@ -167,17 +173,14 @@
           <div class="stat"><b id="sNo" style="color:var(--no)">–</b><span>Don't know</span></div>
           <div class="stat"><b id="sMay" style="color:var(--may)">–</b><span>Not sure</span></div>
         </div>
-      </div>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:6px;flex-wrap:wrap">
-          <h2 style="margin:0">By surveyor</h2>
-          <div style="display:flex;gap:6px">
-            <button class="btn ghost small refresh">↻ Refresh</button>
-            <button class="btn ghost small" id="dlCsv">Download CSV</button>
+        <div style="margin-top:14px">
+          <div class="meta muted" style="font-size:13px">Awareness across all stores</div>
+          <div class="bar" style="height:12px;border-radius:6px;display:flex">
+            <i id="barYes" style="background:var(--yes);width:0"></i><i id="barMay" style="background:var(--may);width:0"></i><i id="barNo" style="background:var(--no);width:0"></i>
           </div>
+          <div class="chips" style="margin-top:8px"><span class="chip yes">Know</span><span class="chip may">Not sure</span><span class="chip no">Don't know</span></div>
         </div>
-        <input type="search" id="search" placeholder="Search surveyor, store or manager…">
-        <div id="dashList"><p class="muted">Loading…</p></div>
+        <p class="muted" id="lastUpd" style="font-size:12px;margin:12px 0 0"></p>
       </div>
     </section>
   </div>
@@ -227,9 +230,9 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
   if (!API_URL) $("localWarn").hidden = false;
 
   async function load(showLoading){
-    if (showLoading){ $("mineList").innerHTML = $("dashList").innerHTML = '<p class="muted">Loading entries…</p>'; }
+    if (showLoading){ $("mineList").innerHTML = '<p class="muted">Loading entries…</p>'; }
     try{ entries = await store.list(); render(); }
-    catch(e){ $("mineList").innerHTML = $("dashList").innerHTML = '<p class="muted">Couldn\'t load entries. Check your connection and tap Refresh.</p>'; }
+    catch(e){ $("mineList").innerHTML = '<p class="muted">Couldn\'t load entries. Check your connection and tap Refresh.</p>'; }
   }
   document.querySelectorAll(".refresh").forEach(b=>b.onclick=()=>load(true));
 
@@ -373,33 +376,12 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
     $("mineList").innerHTML = mine.length ? mine.map(e=>entryHtml(e,true)).join("")
       : '<p class="muted">You haven\'t added any entries yet. Use "+ Add entry" to add your first store.</p>';
 
-    // dashboard grouped by surveyor
-    const q = norm($("search").value);
-    const groups = new Map();
-    entries.forEach(e=>{
-      const k = norm(e.by) || "(no name)";
-      if(!groups.has(k)) groups.set(k,{name:nice(e.by)||"(no name)", list:[]});
-      groups.get(k).list.push(e);
-    });
-    let gs = [...groups.entries()].map(([k,g])=>{
-      const list = q ? g.list.filter(e=>norm(g.name+" "+e.location+" "+e.manager).includes(q)) : g.list;
-      return {k, name:g.name, list, t:tally(g.list)};
-    }).filter(g=>g.list.length);
-    gs.sort((a,b)=>b.t.people-a.t.people || a.name.localeCompare(b.name));
-    if (!entries.length){ $("dashList").innerHTML='<p class="muted">No entries yet.</p>'; return; }
-    if (!gs.length){ $("dashList").innerHTML='<p class="muted">No matches.</p>'; return; }
-    $("dashList").innerHTML = gs.map((g,i)=>`<details class="sv"${q||gs.length===1?" open":""}>
-      <summary>
-        <span class="rank">${i+1}</span>
-        <span class="avatar">${esc(g.name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase())}</span>
-        <span class="nm"><b>${esc(g.name)}${g.k===norm(me)?'<span class="me-tag">You</span>':""}</b>
-          <span>${g.t.stores} store${g.t.stores===1?"":"s"} · ${g.t.people} people · ${g.t.yes} know · ${g.t.no} don't · ${g.t.may} not sure</span></span>
-        <span class="pc">${g.t.pct==null?"–":g.t.pct+"%"}<small>aware</small></span>
-      </summary>
-      <div class="body">${g.list.map(e=>entryHtml(e, g.k===norm(me))).join("")}</div>
-    </details>`).join("");
+    // overall awareness bar
+    const w = v => t.people ? (v*100/t.people)+"%" : "0";
+    $("barYes").style.width=w(t.yes); $("barMay").style.width=w(t.may); $("barNo").style.width=w(t.no);
+    $("lastUpd").textContent = "Updated "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
   }
-  $("search").addEventListener("input", render);
+
 
   document.addEventListener("click", async ev=>{
     const ed = ev.target.closest("[data-edit]"), dl = ev.target.closest("[data-del]");
