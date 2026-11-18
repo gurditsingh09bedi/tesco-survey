@@ -51,7 +51,7 @@
   .bar i{display:block;height:100%;background:var(--yes)}
   .warn{background:#fff7e6;border:1px solid #f5d38a;color:#7a5200;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px}
   input[type=search]{margin-bottom:8px}
-  @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}.row2{grid-template-columns:1fr}}
+  @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)!important}.row2{grid-template-columns:1fr}}
   .tabs{display:flex;gap:6px;margin-bottom:14px;background:#e8edf5;padding:4px;border-radius:10px}
   .tabs button{flex:1;border:0;background:none;padding:10px 6px;border-radius:8px;font-size:14px;font-weight:600;color:var(--mut);cursor:pointer}
   .tabs button.on{background:#fff;color:var(--pri);box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -70,6 +70,21 @@
   .sv[open] summary{background:#f7f9fc}
   .rank{font-size:12px;color:var(--mut);width:18px;text-align:center}
   .me-tag{font-size:11px;background:#e6efff;color:var(--pri);padding:2px 6px;border-radius:10px;margin-left:4px;font-weight:600}
+  .emp{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px}
+  .emp-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .emp-top b{font-size:14px;margin-right:2px}
+  .emp-top .sp{flex:1}
+  .stage{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:600}
+  .st-pending{background:#eef0f4;color:#475467}
+  .st-interested{background:#e6efff;color:#0b4ea2}
+  .st-contract{background:#fff3df;color:#8a5a00}
+  .st-joined{background:#e3f5ea;color:#1a7f4b}
+  .st-not_interested{background:#fde8e6;color:#a1281c}
+  .fu{background:#f7f9fc;border-radius:8px;padding:10px;margin-top:8px}
+  .fu label{margin-top:6px}
+  .hist{margin:8px 0 0;padding:0;list-style:none;font-size:12px;color:var(--mut)}
+  .hist li{padding:5px 0;border-top:1px dashed var(--line)}
+  .hist li b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -109,6 +124,14 @@
           <i id="barYes" style="background:var(--yes);width:0"></i><i id="barMay" style="background:var(--may);width:0"></i><i id="barNo" style="background:var(--no);width:0"></i>
         </div>
         <div class="chips" style="margin-top:8px"><span class="chip yes">Know</span><span class="chip may">Not sure</span><span class="chip no">Don't know</span></div>
+      </div>
+      <div class="meta muted" style="font-size:13px;margin-top:14px">Follow-up status (all employees asked)</div>
+      <div class="stats" style="margin-top:6px;grid-template-columns:repeat(5,1fr)">
+        <div class="stat"><b id="fJoined" style="color:var(--yes)">–</b><span>Joined</span></div>
+        <div class="stat"><b id="fInterested" style="color:var(--pri)">–</b><span>Interested</span></div>
+        <div class="stat"><b id="fContract" style="color:var(--may)">–</b><span>Contract elsewhere</span></div>
+        <div class="stat"><b id="fPending">–</b><span>Pending</span></div>
+        <div class="stat"><b id="fNot" style="color:var(--no)">–</b><span>Not interested</span></div>
       </div>
       <p class="muted" id="lastUpd" style="font-size:12px;margin:12px 0 0"></p>
     </div>
@@ -195,6 +218,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
   const $ = id => document.getElementById(id);
   const STATUS = {yes:"Knows", no:"Doesn't know", may:"Not sure"};
   const LOCAL_KEY = "tm_survey_entries";
+  const STAGE = {pending:"Update pending", interested:"Interested", contract:"Has contract elsewhere", joined:"Joined Tesco Mobile", not_interested:"Not interested"};
+  const stageOf = p => (p.follow && STAGE[p.follow.stage]) ? p.follow.stage : "pending";
   let entries = [], editingId = null, me = "";
   const norm = s => String(s||"").trim().replace(/\s+/g," ").toLowerCase();
   const nice = s => String(s||"").trim().replace(/\s+/g," ").replace(/\b\w/g,c=>c.toUpperCase());
@@ -263,6 +288,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
     const row = document.createElement("div");
     row.className = "person";
     row.dataset.status = p.status || "";
+    row._follow = p.follow || null;
     const inp = document.createElement("input");
     inp.placeholder = "Employee name (optional)"; inp.maxLength = 60; inp.value = p.name || "";
     const seg = document.createElement("div"); seg.className = "seg";
@@ -280,7 +306,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
   function readPeople(){
     return [...$("people").children].map(r=>({
       name: r.querySelector("input").value.trim(),
-      status: r.dataset.status
+      status: r.dataset.status,
+      follow: r._follow || undefined
     })).filter(p=>p.status || p.name);
   }
   $("addPerson").onclick = ()=>addPersonRow();
@@ -351,10 +378,58 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
       </div>
       <div class="meta" style="margin-top:6px"><b>${y} of ${ppl.length}</b> know Tesco Mobile (${pct}%)</div>
       <div class="bar"><i style="width:${pct}%"></i></div>
-      <div class="chips">${ppl.map((p,i)=>`<span class="chip ${esc(p.status)}">${esc(p.name||"Person "+(i+1))}: ${esc(STATUS[p.status]||"")}</span>`).join("")}</div>
+      ${editable ? ppl.map((p,i)=>empHtml(e,p,i)).join("") : `<div class="chips">${ppl.map((p,i)=>`<span class="chip ${esc(p.status)}">${esc(p.name||"Person "+(i+1))}: ${esc(STATUS[p.status]||"")}</span>`).join("")}</div>`}
       ${e.comments?`<div class="note">${esc(e.comments)}</div>`:""}
     </div>`;
   }
+  function fmtDate(d){ if(!d) return ""; const x=new Date(d); return isNaN(x)?esc(d):x.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}); }
+  function empHtml(e,p,i){
+    const st = stageOf(p), f = p.follow || {}, ups = f.updates || [], last = ups[ups.length-1];
+    return `<div class="emp" data-emp="${esc(e.id)}|${i}">
+      <div class="emp-top">
+        <b>${esc(p.name||"Person "+(i+1))}</b>
+        <span class="chip ${esc(p.status)}">${esc(STATUS[p.status]||"")}</span>
+        <span class="stage st-${st}">${esc(STAGE[st])}</span>
+        <span class="sp"></span>
+        <button class="btn ghost small" data-fu="${esc(e.id)}|${i}">Update</button>
+      </div>
+      ${st==="contract"&&f.contractEnd?`<div class="meta">Contract ends: <b>${fmtDate(f.contractEnd)}</b></div>`:""}
+      ${last?`<div class="meta">Last update ${fmtDate(last.date)}${last.by?" by "+esc(last.by):""}${last.note?": "+esc(last.note):""}</div>`:`<div class="meta">No follow-up yet</div>`}
+    </div>`;
+  }
+  function openFollow(eid, i){
+    document.querySelectorAll(".fu").forEach(x=>x.remove());
+    const e = entries.find(x=>x.id===eid); if(!e) return;
+    const p = (e.people||[])[i]; if(!p) return;
+    const f = p.follow || {}, st = stageOf(p), ups = (f.updates||[]).slice().reverse();
+    const box = document.createElement("div"); box.className="fu";
+    box.innerHTML = `
+      <label>Follow-up status</label>
+      <select class="fu-stage">${Object.keys(STAGE).map(k=>`<option value="${k}"${k===st?" selected":""}>${STAGE[k]}</option>`).join("")}</select>
+      <div class="fu-cwrap"${st==="contract"?"":" hidden"}><label>Contract ends on (optional)</label><input type="date" class="fu-cend" value="${esc(f.contractEnd||"")}"></div>
+      <label>Note</label>
+      <textarea class="fu-note" maxlength="500" placeholder="e.g. Spoke again – will switch after her current contract ends"></textarea>
+      <div class="actions"><button type="button" class="btn pri small fu-save">Save update</button><button type="button" class="btn ghost small fu-cancel">Cancel</button></div>
+      <div class="msg fu-msg"></div>
+      ${ups.length?`<ul class="hist">${ups.map(u=>`<li><b>${fmtDate(u.date)}</b>${u.by?" · "+esc(u.by):""} · ${esc(STAGE[u.stage]||"")}${u.note?"<br>"+esc(u.note):""}</li>`).join("")}</ul>`:""}`;
+    document.querySelector(`[data-emp="${CSS.escape(eid+"|"+i)}"]`).appendChild(box);
+    box.querySelector(".fu-stage").onchange = ev => box.querySelector(".fu-cwrap").hidden = ev.target.value!=="contract";
+    box.querySelector(".fu-cancel").onclick = ()=>box.remove();
+    box.querySelector(".fu-save").onclick = async ()=>{
+      const stage = box.querySelector(".fu-stage").value;
+      const note = box.querySelector(".fu-note").value.trim();
+      const cend = stage==="contract" ? box.querySelector(".fu-cend").value : (f.contractEnd||"");
+      const now = new Date().toISOString();
+      const people = (e.people||[]).map((x,j)=> j!==i ? x : Object.assign({}, x, {follow:{
+        stage, contractEnd: cend,
+        updates: (f.updates||[]).concat([{date:now, by:me, stage, note}])
+      }}));
+      const btn = box.querySelector(".fu-save"); btn.disabled = true; btn.textContent = "Saving…";
+      try{ await store.save(Object.assign({}, e, {people, updatedAt: now})); await load(); }
+      catch(err){ btn.disabled=false; btn.textContent="Save update"; box.querySelector(".fu-msg").textContent="Couldn't save – try again."; }
+    };
+  }
+
   function render(){
     // surveyor suggestions for login
     const names = [...new Map(entries.filter(e=>e.by).map(e=>[norm(e.by), nice(e.by)])).values()].sort();
@@ -374,6 +449,12 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
     $("mineList").innerHTML = mine.length ? mine.map(e=>entryHtml(e,true)).join("")
       : '<p class="muted">You haven\'t added any entries yet. Use "+ Add entry" to add your first store.</p>';
 
+    // follow-up counts
+    const fc = {pending:0, interested:0, contract:0, joined:0, not_interested:0};
+    entries.forEach(e=>(e.people||[]).forEach(p=>fc[stageOf(p)]++));
+    $("fJoined").textContent=fc.joined; $("fInterested").textContent=fc.interested; $("fContract").textContent=fc.contract;
+    $("fPending").textContent=fc.pending; $("fNot").textContent=fc.not_interested;
+
     // overall awareness bar
     const w = v => t.people ? (v*100/t.people)+"%" : "0";
     $("barYes").style.width=w(t.yes); $("barMay").style.width=w(t.may); $("barNo").style.width=w(t.no);
@@ -382,6 +463,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
 
 
   document.addEventListener("click", async ev=>{
+    const fu = ev.target.closest("[data-fu]");
+    if (fu){ const [eid,i] = fu.dataset.fu.split("|"); openFollow(eid, +i); return; }
     const ed = ev.target.closest("[data-edit]"), dl = ev.target.closest("[data-del]");
     if (ed){
       const e = entries.find(x=>x.id===ed.dataset.edit); if(!e) return;
@@ -403,8 +486,8 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
 
   // ---------- CSV download ----------
   $("dlCsv").onclick = ()=>{
-    const rows=[["Surveyor","Store location","Manager","Date","Employee asked","Knows Tesco Mobile","Comments"]];
-    entries.forEach(e=>(e.people||[]).forEach((p,i)=>rows.push([nice(e.by),e.location,e.manager,e.date,p.name||"Person "+(i+1),STATUS[p.status]||"",e.comments])));
+    const rows=[["Surveyor","Store location","Manager","Date","Employee asked","Knows Tesco Mobile","Follow-up status","Contract ends","Last update","Last note","Comments"]];
+    entries.forEach(e=>(e.people||[]).forEach((p,i)=>{ const f=p.follow||{}, u=(f.updates||[]).slice(-1)[0]||{}; rows.push([nice(e.by),e.location,e.manager,e.date,p.name||"Person "+(i+1),STATUS[p.status]||"",STAGE[stageOf(p)],f.contractEnd||"",(u.date||"").slice(0,10),u.note||"",e.comments]); }));
     const csv = rows.map(r=>r.map(v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"').join(",")).join("\r\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));
@@ -417,7 +500,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyia4kgS6J4kUQY-Vl7zauZ
   let saved = ""; try{ saved = localStorage.getItem("tm_by") || ""; }catch(e){}
   if (saved) setMe(saved); else $("loginCard").hidden = false;
   load(true);
-  setInterval(()=>{ if(!document.hidden && !editingId) load(); }, 30000);
+  setInterval(()=>{ if(!document.hidden && !editingId && !document.querySelector(".fu")) load(); }, 30000);
 })();
 </script>
 </body>
